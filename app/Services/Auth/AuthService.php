@@ -80,6 +80,9 @@ class AuthService
     public function attempt($email, $password)
     {
 
+        var_dump(!$user = $this->userMapper->findByEmail($email));
+        exit;
+
         if (!$user = $this->userMapper->findByEmail($email)) {
             return false;
         }
