@@ -70,11 +70,10 @@ class UserMapper
         $stmt->execute([':email' => $email]);
 
         $data = $stmt->fetch(PDO::FETCH_OBJ);
-
         if ($data) {
             return $data;
         }
-        return FALSE;
+        return false;
     }
     public function findByStudent_id($academic_id, $student_id, $dob)
     {
