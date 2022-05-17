@@ -110,7 +110,7 @@ class AccountController
     }
 
     //customer_buyer_dalate info
-    public function customer_buyer_dalate(Request $req, Response $res)
+    public function customer_buyer_delete(Request $req, Response $res)
     {
         $requestUser = $this->auth->requestUser($req);
         $admin_id = $this->user->get_User_Id();
@@ -122,6 +122,76 @@ class AccountController
         }
         $data = $req->getParsedBody();
         $res_data = $this->account->customerDelete($admin_id, $data);
+
+        return $res->withJson($res_data);
+    }
+    //user_list info
+    public function user_list(Request $req, Response $res)
+    {
+        $requestUser = $this->auth->requestUser($req);
+        $admin_id = $this->user->get_User_Id();
+        if (is_null($requestUser)) {
+            return $res->withJson([], 401);
+        }
+        if ($requestUser['id'] !== $admin_id) {
+            return $res->withJson([], 401);
+        }
+        $data = $req->getParsedBody();
+
+        $res_data = $this->account->userList($admin_id, $data);
+
+        return $res->withJson($res_data);
+    }
+
+    //user_add info
+    public function user_add(Request $req, Response $res)
+    {
+        $requestUser = $this->auth->requestUser($req);
+        $admin_id = $this->user->get_User_Id();
+        if (is_null($requestUser)) {
+            return $res->withJson([], 401);
+        }
+        if ($requestUser['id'] !== $admin_id) {
+            return $res->withJson([], 401);
+        }
+        $data = $req->getParsedBody();
+
+        $res_data = $this->account->userAdd($admin_id, $data);
+
+        return $res->withJson($res_data);
+    }
+
+    //user_edit info
+    public function user_edit(Request $req, Response $res)
+    {
+        $requestUser = $this->auth->requestUser($req);
+        $admin_id = $this->user->get_User_Id();
+        if (is_null($requestUser)) {
+            return $res->withJson([], 401);
+        }
+        if ($requestUser['id'] !== $admin_id) {
+            return $res->withJson([], 401);
+        }
+        $data = $req->getParsedBody();
+
+        $res_data = $this->account->userEdit($admin_id, $data);
+
+        return $res->withJson($res_data);
+    }
+
+    //user_delete info
+    public function user_delete(Request $req, Response $res)
+    {
+        $requestUser = $this->auth->requestUser($req);
+        $admin_id = $this->user->get_User_Id();
+        if (is_null($requestUser)) {
+            return $res->withJson([], 401);
+        }
+        if ($requestUser['id'] !== $admin_id) {
+            return $res->withJson([], 401);
+        }
+        $data = $req->getParsedBody();
+        $res_data = $this->account->userDelete($admin_id, $data);
 
         return $res->withJson($res_data);
     }

@@ -94,7 +94,7 @@ class Account
             $customer_id = $this->customer_id($customer_type);
             try {
                 //code...
-                $qry_ins_std = "INSERT INTO `customer`(`admin_id`, `customer_id`, `customer_type`, `customer_name`, `customer_email`, `customer_phone`, `customer_creation`, `customer_eff_sdc_start_date`, `customer_eff_sdc_end_date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $qry_ins_std = "INSERT INTO `customer`(`admin_id`, `customer_id`, `customer_type`, `customer_name`, `customer_email`, `customer_phone`, `customer_creation`, `customer_eff_sdc_start_date`, `customer_eff_sdc_end_date`) VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
                 if ($res_ins_std->execute([$admin_id, $customer_id, $customer_type, $customer_name, $customer_email, $customer_phone, $date, $date, null])) {
                     $data['error']  = false;
@@ -108,7 +108,7 @@ class Account
             } catch (\Throwable $th) {
                 if ($th->getCode() === "23000") {
                     $customer_id = $this->customer_id($customer_type);
-                    $qry_ins_std = "INSERT INTO `customer`(`admin_id`, `customer_id`, `customer_type`, `customer_name`, `customer_email`, `customer_phone`, `customer_creation`, `customer_eff_sdc_start_date`, `customer_eff_sdc_end_date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    $qry_ins_std = "INSERT INTO `customer`(`admin_id`, `customer_id`, `customer_type`, `customer_name`, `customer_email`, `customer_phone`, `customer_creation`, `customer_eff_sdc_start_date`, `customer_eff_sdc_end_date`) VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
                     if ($res_ins_std->execute([$admin_id, $customer_id, $customer_type, $customer_name, $customer_email, $customer_phone, $date, $date, null])) {
                         $data['error']  = false;
@@ -175,7 +175,7 @@ class Account
                 $qry_upd_cust = "UPDATE `customer` SET `customer_eff_sdc_end_date`= CURRENT_TIMESTAMP WHERE `customer_id` = ? AND `customer_eff_sdc_end_date` IS NULL";
                 $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
                 if ($res_upd_cust->execute([$customer_id])) {
-                    $qry_ins_std = "INSERT INTO `customer`(`admin_id`, `customer_id`, `customer_type`, `customer_name`, `customer_email`, `customer_phone`, `customer_creation`, `customer_eff_sdc_start_date`, `customer_eff_sdc_end_date`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    $qry_ins_std = "INSERT INTO `customer`(`admin_id`, `customer_id`, `customer_type`, `customer_name`, `customer_email`, `customer_phone`, `customer_creation`, `customer_eff_sdc_start_date`, `customer_eff_sdc_end_date`) VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                     $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
                     if ($res_ins_std->execute([$admin_id, $customer_id, $customer_type, $customer_name, $customer_email, $customer_phone, $date, $date, null])) {
                         $data['error']  = false;
@@ -203,6 +203,132 @@ class Account
         }
     }
 
+    //User Completed info
+    public function userList($admin_id)
+    {
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+        $qry_ins_std = "SELECT * FROM `user` WHERE `adminid` = ? AND `effective_date` IS NULL";
+        $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
+        if ($res_ins_std->execute([$admin_id])) {
+            $row_fet_batch = $res_ins_std->fetchAll();
+            $data['error']  = false;
+            $data['msg']  = "User list fetched Successfully";
+            $data["data"] = $row_fet_batch;
+            return $data;
+        } else {
+            $data['error']  = true;
+            $data['msg']  = "Customer is not found";
+            return $data;
+        }
+    }
+    public function userAdd($admin_id, $params)
+    {
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+
+        $user_fname = $params["u_fname"];
+        $user_lname = $params["u_lname"];
+        $user_email = $params["u_email"];
+        $user_status = $params["u_status"];
+        $user_role = $params["u_role"];
+        $user_password = md5($params["u_password"]);
+        if (!empty($user_role) && !empty($user_email) && (!empty($user_status) && ($user_status === "0" || $user_status === "1")) && !empty($user_password) && !empty($user_fname) && !empty($user_lname)) {
+            $date = date("Y-m-d H:i:s");
+            if ($this->user_email_exists($user_email)) {
+                $data['error']  = true;
+                $data['msg']  = "Email is exists or not valid number";
+                return $data;
+            }
+            try {
+                //code...
+                $qry_ins_std = "INSERT INTO `user`(`adminid`, `first_name`, `last_name`, `email`, `password`, `status`, `role`, `hash`, `created_on`) VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
+                if ($res_ins_std->execute([$admin_id, $user_fname, $user_lname, $user_email, $user_password, $user_status, $user_role, RAND(9999, 99999), $date])) {
+                    $data['error']  = false;
+                    $data['msg']  = "User added Successfully";
+                    return $data;
+                } else {
+                    $data['error']  = true;
+                    $data['msg']  = "User could not add to storage";
+                    return $data;
+                }
+            } catch (\Throwable $th) {
+
+                $data['error']  = true;
+                $data['msg']  = "User could not be able to enter";
+                return $data;
+            }
+        } else {
+            $data['error']  = true;
+            $data['msg']  = "Invalid User Cred";
+            return $data;
+        }
+    }
+    public function userDelete($admin_id, $params)
+    {
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+        $customer_id = $params['u_id'];
+        try {
+            //code...
+            $qry_upd_cust = "UPDATE `user` SET `effective_date`= CURRENT_TIMESTAMP() WHERE `id` = ?  AND `adminid` = ?";
+            $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
+            if ($res_upd_cust->execute([$customer_id, $admin_id])) {
+                $data['error']  = false;
+                $data['msg']  = "User Deleted Successfully";
+                return $data;
+            } else {
+                $data['error']  = true;
+                $data['msg']  = "User could not delete";
+                return $data;
+            }
+        } catch (\Throwable $th) {
+            $data['error']  = true;
+            $data['msg']  = "User could not be able to delete";
+            return $data;
+        }
+    }
+    public function userEdit($admin_id, $params)
+    {
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+        $user_id = $params["u_id"];
+        $user_fname = $params["u_fname"];
+        $user_lname = $params["u_lname"];
+        $user_email = $params["u_email"];
+        $user_status = $params["u_status"];
+        $user_role = $params["u_role"];
+        $user_password = md5($params["u_password"]);
+        if (!empty($customer_type) && ($customer_type === "C" || $customer_type === "S")) {
+            $date = date("Y-m-d H:i:s");
+
+            if ($this->user_email_exists($user_email)) {
+                $data['error']  = true;
+                $data['msg']  = "Email is exists or not valid number";
+                return $data;
+            }
+            try {
+                //code...
+                $qry_upd_cust = "UPDATE `customer` SET `customer_eff_sdc_end_date`= CURRENT_TIMESTAMP WHERE `customer_id` = ? AND `customer_eff_sdc_end_date` IS NULL";
+                $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
+                if ($res_upd_cust->execute([$user_id])) {
+                    $data['error']  = false;
+                    $data['msg']  = "User edited Successfully";
+                    return $data;
+                } else {
+                    $data['error']  = true;
+                    $data['msg']  = "User could not add to storage";
+                    return $data;
+                }
+            } catch (\Throwable $th) {
+                $data['error']  = true;
+                $data['msg']  = "User could not be able to enter";
+                return $data;
+            }
+        } else {
+            $data['error']  = true;
+            $data['msg']  = "Invalid User_type";
+            return $data;
+        }
+    }
+
     private function customer_phone_exists($c_phone_number)
     {
         if (strlen($c_phone_number) !== 10) {
@@ -211,6 +337,20 @@ class Account
         $qry_ins_std = "SELECT * FROM `customer` WHERE `customer_phone` = ? AND `customer_eff_sdc_end_date` IS NULL";
         $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
         $res_ins_std->execute([$c_phone_number]);
+        if ($res_ins_std->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    private function user_email_exists($c_email_number)
+    {
+        if (!filter_var($c_email_number, FILTER_VALIDATE_EMAIL)) {
+            return true;
+        }
+        $qry_ins_std = "SELECT `first_name` FROM `user` WHERE `email` = ? AND `effective_date` IS NULL";
+        $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
+        $res_ins_std->execute([$c_email_number]);
         if ($res_ins_std->rowCount() > 0) {
             return true;
         } else {
