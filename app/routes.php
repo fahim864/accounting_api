@@ -15,7 +15,8 @@ $app->group('/v1/customer', function () use ($app) {
     $jwtMiddleware = $this->getContainer()->get('jwt');
     $app->get('/list', AccountController::class . ':customer_buyer_list')->add($jwtMiddleware)->setName('account.Customer_list');
     $app->post('/add', AccountController::class . ':customer_buyer_add')->add($jwtMiddleware)->setName('account.Customer_Add');
-    $app->post('/edit', AccountController::class . ':customer_buyer_edit')->add($jwtMiddleware)->setName('account.Customer_Edit');
+    $app->put('/edit', AccountController::class . ':customer_buyer_edit')->add($jwtMiddleware)->setName('account.Customer_Edit');
+    $app->delete('/delete', AccountController::class . ':customer_buyer_dalate')->add($jwtMiddleware)->setName('account.Customer_Delete');
 });
 
 $app->group('/v2/course', function () use ($app) {
