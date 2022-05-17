@@ -32,10 +32,13 @@ class Account
 
 
     //Course Completed info
-    public function courseCompletedModel($admin_id)
+    public function selectData($admin_id, $cols, $table_name, $where = null, $limit = null)
     {
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+        $cols = filter_var($cols, FILTER_SANITIZE_STRING);
+        $table_name = filter_var($table_name, FILTER_SANITIZE_STRING);
         $date = date("Y-m-d H:i:s");
-        $qry_ins_std = "SELECT a.`id`, a.`student_name`, a.`phone_number`, a.`end_date`, a.`basis`, b.`batch_name`, a.`batch`, ''  AS `class`  FROM `student` AS a LEFT JOIN `batch` AS b ON a.`batch` = b.`id` WHERE a.`admin_id` = ?  AND a.`basis` = 'Course Basis' AND a.`end_date` < CURRENT_DATE();";
+        $qry_ins_std = "SELECT " . $cols . "  FROM " . $table_name . " WHERE `admin_id` = ?";
         $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
         if ($res_ins_std->execute([$admin_id])) {
             $row_fet_batch = $res_ins_std->fetchAll();
@@ -49,25 +52,29 @@ class Account
             return $data;
         }
     }
-
-
-
-
-    private function userExistCheckPhone($p = null)
+    public function customerList($admin_id, $data)
     {
-        if ($p !== null) {
-            $phone_number = $p;
-            $qry_usr = "SELECT * FROM `admin` WHERE `phone` = :phone";
-            $res_usr = $this->dbhandler->prepare($qry_usr);
-            $res_usr->execute([':phone' => $phone_number]);
-            $row_usr_cnt = $res_usr->rowCount();
-            if ($row_usr_cnt > 0) {
-                return true;
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+        $customer_type = $data['c_type'];
+        if (!empty($customer_type) && ($customer_type === "C" || $customer_type === "S")) {
+            $date = date("Y-m-d H:i:s");
+            $qry_ins_std = "SELECT * FROM `customer` WHERE `admin_id` = ? AND `customer_type` = ?";
+            $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
+            if ($res_ins_std->execute([$admin_id, $customer_type])) {
+                $row_fet_batch = $res_ins_std->fetchAll();
+                $data['error']  = false;
+                $data['msg']  = "Course list fetched Successfully";
+                $data["data"] = $row_fet_batch;
+                return $data;
             } else {
-                return false;
+                $data['error']  = true;
+                $data['msg']  = "Customer is not found";
+                return $data;
             }
         } else {
-            return false;
+            $data['error']  = true;
+            $data['msg']  = "Invalid Parameter";
+            return $data;
         }
     }
 }
