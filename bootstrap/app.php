@@ -79,7 +79,7 @@ $app = new \Slim\App([
         // api rate limiter settings
         'api_rate_limiter' => [
             'requests' => '200',
-            'inmins' => '60',
+            'inmins' => '180',
         ],
     ]
 
