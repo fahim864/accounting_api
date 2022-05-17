@@ -90,4 +90,22 @@ class AccountController
 
         return $res->withJson($res_data);
     }
+    //customer_buyer_edit info
+    public function customer_buyer_edit(Request $req, Response $res)
+    {
+        $requestUser = $this->auth->requestUser($req);
+        $admin_id = $this->user->get_User_Id();
+        if (is_null($requestUser)) {
+            return $res->withJson([], 401);
+        }
+        if ($requestUser['id'] !== $admin_id) {
+            return $res->withJson([], 401);
+        }
+        $data = $req->getParsedBody();
+        var_dump($data);
+        exit;
+        // $res_data = $this->account->customerAdd($admin_id, $data);
+
+        // return $res->withJson($res_data);
+    }
 }
