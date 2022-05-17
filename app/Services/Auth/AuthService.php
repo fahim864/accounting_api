@@ -79,20 +79,13 @@ class AuthService
 
     public function attempt($email, $password)
     {
-
-        var_dump(!$user = $this->userMapper->findByEmail($email));
-        exit;
-
         if (!$user = $this->userMapper->findByEmail($email)) {
-            return false;
+            return 2;
         }
-
-
         if (md5($password) == $user->password) {
             return $user;
         }
-
-        return false;
+        return 1;
     }
 
     public function attempt_for_student($academic_id, $student_id, $dob)

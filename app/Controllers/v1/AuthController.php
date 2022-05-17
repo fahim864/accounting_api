@@ -36,20 +36,22 @@ class AuthController
     {
         $userParams = $request->getParsedBody();
         if (!isset($userParams["identity"])) {
-            if ($user = $this->auth->attempt($userParams['email'], $userParams['password'])) {
+            $user = $this->auth->attempt($userParams['email'], $userParams['password']);
 
-                if (!$user->token = $this->auth->generateToken($user)) {
-                    return $response->withJson(
-                        ['error' => false, "message" => "Invaild Cred"],
-                        401
-                    );
-                }
-                $user->password = '';
-                return $response->withJson(['error' => false, 'message' => "User validate successfully",  'data' => $user]);
-            } else {
+            if ($user === 1) {
+                return $response->withJson(
+                    ['error' => false, "message" => "Invaild Cred"],
+                    401
+                );
+            } elseif ($user === 2) {
                 $user = $this->auth->createUserAdmin($userParams['email'], $userParams['password'], $userParams['name']);
 
                 $user->token = $this->auth->generateToken($user);
+                $user->password = '';
+                return $response->withJson(['error' => false, 'message' => "User validate successfully",  'data' => $user]);
+            } else {
+                if (!$user->token = $this->auth->generateToken($user)) {
+                }
                 $user->password = '';
                 return $response->withJson(['error' => false, 'message' => "User validate successfully",  'data' => $user]);
             }
