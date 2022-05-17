@@ -77,4 +77,32 @@ class Account
             return $data;
         }
     }
+    public function customerAdd($admin_id, $data)
+    {
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+        $customer_name = $data['c_name'];
+        $customer_email = $data['c_email'];
+        $customer_phone = $data['c_phone'];
+        $customer_type = $data['c_type'];
+        if (!empty($customer_type) && ($customer_type === "C" || $customer_type === "S")) {
+            $date = date("Y-m-d H:i:s");
+            $qry_ins_std = "INSERT INTO `customer`(`admin_id`, `customer_id`, `customer_type`, `customer_name`, `customer_email`, `customer_phone`, `customer_creation`, `customer_eff_sdc_start_date`, `customer_eff_sdc_end_date`) VALUES ()";
+            $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
+            if ($res_ins_std->execute([$admin_id, $customer_type])) {
+                $row_fet_batch = $res_ins_std->fetchAll();
+                $data['error']  = false;
+                $data['msg']  = "Course list fetched Successfully";
+                $data["data"] = $row_fet_batch;
+                return $data;
+            } else {
+                $data['error']  = true;
+                $data['msg']  = "Customer is not found";
+                return $data;
+            }
+        } else {
+            $data['error']  = true;
+            $data['msg']  = "Invalid customer_type";
+            return $data;
+        }
+    }
 }
