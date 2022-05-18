@@ -225,7 +225,7 @@ class AccountController
             return $res->withJson([], 401);
         }
         $data = $req->getParsedBody();
-        $res_data = $this->account->productslist($admin_id, $data);
+        $res_data = $this->account->productslist($admin_id);
 
         return $res->withJson($res_data);
     }

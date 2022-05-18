@@ -393,26 +393,27 @@ class Account
         }
     }
 
-    public function productslist($admin_id, $params)
+    public function productslist($admin_id)
     {
         $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
         try {
             //code...
-            $qry_upd_cust = "SELECT `setting_name` FROM `settings` WHERE `admin_id` = ?";
+            $qry_upd_cust = "SELECT * FROM `goods_master` WHERE `admin_id` = ? AND `effective_end_date` IS NULL";
             $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
-            $res_upd_cust->execute([$admin_id]);
-            if ($res_upd_cust->rowCount() > 0) {
+            if ($res_upd_cust->execute([$admin_id])) {
+                $row_upd_cust = $res_upd_cust->fetchAll();
                 $data['error']  = false;
-                $data['msg']  = "User Deleted Successfully";
+                $data['msg']  = "Product fetched Successfully";
+                $data['data'] = $row_upd_cust;
                 return $data;
             } else {
                 $data['error']  = true;
-                $data['msg']  = "User could not delete";
+                $data['msg']  = "Product could not delete";
                 return $data;
             }
         } catch (\Throwable $th) {
             $data['error']  = true;
-            $data['msg']  = "User could not be able to delete";
+            $data['msg']  = "Product could not be able to delete";
             return $data;
         }
     }
