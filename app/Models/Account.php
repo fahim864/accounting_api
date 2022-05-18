@@ -418,6 +418,52 @@ class Account
         }
     }
 
+    public function productsAdd($admin_id, $params)
+    {
+        var_dump($params);
+        exit;
+        
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+
+        $user_fname = $params["u_fname"];
+        $user_lname = $params["u_lname"];
+        $user_email = $params["u_email"];
+        $user_status = $params["u_status"];
+        $user_role = $params["u_role"];
+        $user_password = md5($params["u_password"]);
+        if (!empty($user_role) && !empty($user_email) && (!empty($user_status) && ($user_status === "0" || $user_status === "1")) && !empty($user_password) && !empty($user_fname) && !empty($user_lname)) {
+            $date = date("Y-m-d H:i:s");
+            if ($this->user_email_exists($user_email)) {
+                $data['error']  = true;
+                $data['msg']  = "Email is exists or not valid number";
+                return $data;
+            }
+            try {
+                //code...
+                $qry_ins_std = "INSERT INTO `user`(`adminid`, `first_name`, `last_name`, `email`, `password`, `status`, `role`, `hash`, `created_on`) VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
+                if ($res_ins_std->execute([$admin_id, $user_fname, $user_lname, $user_email, $user_password, $user_status, $user_role, RAND(9999, 99999), $date])) {
+                    $data['error']  = false;
+                    $data['msg']  = "User added Successfully";
+                    return $data;
+                } else {
+                    $data['error']  = true;
+                    $data['msg']  = "User could not add to storage";
+                    return $data;
+                }
+            } catch (\Throwable $th) {
+
+                $data['error']  = true;
+                $data['msg']  = "User could not be able to enter";
+                return $data;
+            }
+        } else {
+            $data['error']  = true;
+            $data['msg']  = "Invalid User Cred";
+            return $data;
+        }
+    }
+
     private function usr_role_exists($role)
     {
         $qry_ins_std = "SELECT `role_name` FROM `user_role` WHERE `id` = ? AND `status` = 0";
