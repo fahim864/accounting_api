@@ -212,4 +212,21 @@ class AccountController
 
         return $res->withJson($res_data);
     }
+
+       //products_list info
+    public function products_list(Request $req, Response $res)
+    {
+        $requestUser = $this->auth->requestUser($req);
+        $admin_id = $this->user->get_User_Id();
+        if (is_null($requestUser)) {
+            return $res->withJson([], 401);
+        }
+        if ($requestUser['id'] !== $admin_id) {
+            return $res->withJson([], 401);
+        }
+        $data = $req->getParsedBody();
+        $res_data = $this->account->productslist($admin_id, $data);
+
+        return $res->withJson($res_data);
+    }
 }

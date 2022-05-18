@@ -30,3 +30,8 @@ $app->group('/v1', function () use ($app) {
     $jwtMiddleware = $this->getContainer()->get('jwt');
     $app->post('/settings', AccountController::class . ':settingsControl')->add($jwtMiddleware)->setName('account.Settings');
 });
+
+$app->group('/v1/products', function () use ($app) {
+    $jwtMiddleware = $this->getContainer()->get('jwt');
+    $app->get('/list', AccountController::class . ':products_list')->add($jwtMiddleware)->setName('account.products_list');
+});
