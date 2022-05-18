@@ -295,27 +295,54 @@ class Account
         $user_email = $params["u_email"];
         $user_status = $params["u_status"];
         $user_role = $params["u_role"];
-        $user_password = md5($params["u_password"]);
-        if (!empty($customer_type) && ($customer_type === "C" || $customer_type === "S")) {
-            $date = date("Y-m-d H:i:s");
+        $user_password = $params["u_password"];
+        $date = date("Y-m-d H:i:s");
+        if ($this->user_email_exists($user_email, $user_id)) {
+            $data['error']  = true;
+            $data['msg']  = "Invalid Creds.";
+            return $data;
+        }
 
-            if ($this->user_email_exists($user_email)) {
-                $data['error']  = true;
-                $data['msg']  = "Email is exists or not valid number";
-                return $data;
-            }
+        if ($this->usr_role_exists($user_role)) {
+            $data['error']  = true;
+            $data['msg']  = "Invalid Role";
+            return $data;
+        }
+
+        if ((strlen($user_status) > 0) && ($user_status === "0" || $user_status === "1")) {
             try {
                 //code...
-                $qry_upd_cust = "UPDATE `customer` SET `customer_eff_sdc_end_date`= CURRENT_TIMESTAMP WHERE `customer_id` = ? AND `customer_eff_sdc_end_date` IS NULL";
-                $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
-                if ($res_upd_cust->execute([$user_id])) {
-                    $data['error']  = false;
-                    $data['msg']  = "User edited Successfully";
-                    return $data;
+                if (empty($user_password)) {
+                    $qry_upd_cust = "UPDATE `user` SET `first_name`= ?,`last_name`= ?,`email`= ?,`status`= ?,`role`= ?,`hash`= ?,`updated_at`= ?,`effective_date`= ? WHERE `id` = ?";
+                    $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
+                    if ($res_upd_cust->execute([$user_fname, $user_lname, $user_email, $user_status, $user_role, random_int(9999999, 99999999), $date, NULL,  $user_id])) {
+                        $data['error']  = false;
+                        $data['msg']  = "User edited Successfully";
+                        return $data;
+                    } else {
+                        $data['error']  = true;
+                        $data['msg']  = "User could not add to storage";
+                        return $data;
+                    }
                 } else {
-                    $data['error']  = true;
-                    $data['msg']  = "User could not add to storage";
-                    return $data;
+                    $message = $this->password_validate($user_password);
+                    if (!$message) {
+                        $qry_upd_cust = "UPDATE `user` SET `first_name`= ?,`last_name`= ?,`email`= ?,`password` = ?, `status`= ?,`role`= ?,`hash`= ?,`updated_at`= ?,`effective_date`= ? WHERE `id` = ?";
+                        $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
+                        if ($res_upd_cust->execute([$user_fname, $user_lname, $user_email, md5($user_password), $user_status, $user_role, random_int(9999999, 99999999), $date, NULL,  $user_id])) {
+                            $data['error']  = false;
+                            $data['msg']  = "User edited Successfully";
+                            return $data;
+                        } else {
+                            $data['error']  = true;
+                            $data['msg']  = "User could not add to storage";
+                            return $data;
+                        }
+                    } else {
+                        $data['error']  = true;
+                        $data['msg']  = $message;
+                        return $data;
+                    }
                 }
             } catch (\Throwable $th) {
                 $data['error']  = true;
@@ -324,9 +351,30 @@ class Account
             }
         } else {
             $data['error']  = true;
-            $data['msg']  = "Invalid User_type";
+            $data['msg']  = "Invalid status";
             return $data;
         }
+    }
+
+    private function usr_role_exists($role)
+    {
+        $qry_ins_std = "SELECT `role_name` FROM `user_role` WHERE `id` = ? AND `status` = 0";
+        $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
+        $res_ins_std->execute([$role]);
+        if ($res_ins_std->rowCount() > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private function password_validate($password)
+    {
+        if (strlen($password) < 8) {
+            return "Passowrd is too short";
+        }
+
+        return false;
     }
 
     private function customer_phone_exists($c_phone_number)
@@ -343,12 +391,16 @@ class Account
             return false;
         }
     }
-    private function user_email_exists($c_email_number)
+    private function user_email_exists($c_email_number, $user_id = null)
     {
         if (!filter_var($c_email_number, FILTER_VALIDATE_EMAIL)) {
             return true;
         }
-        $qry_ins_std = "SELECT `first_name` FROM `user` WHERE `email` = ? AND `effective_date` IS NULL";
+        if ($user_id === NULL) {
+            $qry_ins_std = "SELECT `first_name` FROM `user` WHERE `email` = ? AND `effective_date` IS NULL";
+        } else {
+            $qry_ins_std = "SELECT `first_name` FROM `user` WHERE `email` = ? AND `effective_date` IS NULL AND `id`<> '$user_id'";
+        }
         $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
         $res_ins_std->execute([$c_email_number]);
         if ($res_ins_std->rowCount() > 0) {
