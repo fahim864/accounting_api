@@ -245,4 +245,21 @@ class AccountController
 
         return $res->withJson($res_data);
     }
+
+    //products_edit info
+    public function products_edit(Request $req, Response $res)
+    {
+        $requestUser = $this->auth->requestUser($req);
+        $admin_id = $this->user->get_User_Id();
+        if (is_null($requestUser)) {
+            return $res->withJson([], 401);
+        }
+        if ($requestUser['id'] !== $admin_id) {
+            return $res->withJson([], 401);
+        }
+        $data = $req->getParsedBody();
+        $res_data = $this->account->productsEdit($admin_id, $data);
+
+        return $res->withJson($res_data);
+    }
 }

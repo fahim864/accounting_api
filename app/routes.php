@@ -34,5 +34,6 @@ $app->group('/v1', function () use ($app) {
 $app->group('/v1/products', function () use ($app) {
     $jwtMiddleware = $this->getContainer()->get('jwt');
     $app->get('/list', AccountController::class . ':products_list')->add($jwtMiddleware)->setName('account.products_list');
-    $app->get('/add', AccountController::class . ':products_add')->add($jwtMiddleware)->setName('account.products_add');
+    $app->post('/add', AccountController::class . ':products_add')->add($jwtMiddleware)->setName('account.products_add');
+    $app->put('/edit', AccountController::class . ':products_edit')->add($jwtMiddleware)->setName('account.products_edit');
 });
