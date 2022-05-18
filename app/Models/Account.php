@@ -359,6 +359,21 @@ class Account
         $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
         try {
             //code...
+            if (empty($params)) {
+                $data['error']  = true;
+                $data['msg']  = "Invalid Creds";
+                return $data;
+            }
+            $d = [];
+            foreach ($params as $k => $v) {
+                $d[$k] = filter_var(htmlentities(strip_tags($v)), 513);
+            }
+
+            $params = $d;
+
+            var_dump($params);
+            exit;
+
             $qry_upd_cust = "SELECT `setting_name` FROM `settings` WHERE `admin_id` = ?";
             $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
             $res_upd_cust->execute([$admin_id]);
