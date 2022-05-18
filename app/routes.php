@@ -26,6 +26,7 @@ $app->group('/v1/user', function () use ($app) {
     $app->delete('/delete', AccountController::class . ':user_delete')->add($jwtMiddleware)->setName('account.User_Delete');
 });
 
-$app->group('/v2/course', function () use ($app) {
+$app->group('/v1', function () use ($app) {
     $jwtMiddleware = $this->getContainer()->get('jwt');
+    $app->post('/settings', AccountController::class . ':settingsControl')->add($jwtMiddleware)->setName('account.Settings');
 });

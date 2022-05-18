@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use PDO;
 use Monolog\Logger;
-use DateTime;
 
 class Account
 {
@@ -352,6 +350,30 @@ class Account
         } else {
             $data['error']  = true;
             $data['msg']  = "Invalid status";
+            return $data;
+        }
+    }
+
+    public function settingsModel($admin_id, $params)
+    {
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+        try {
+            //code...
+            $qry_upd_cust = "SELECT `setting_name` FROM `settings` WHERE `admin_id` = ?";
+            $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
+            $res_upd_cust->execute([$admin_id]);
+            if ($res_upd_cust->rowCount() > 0) {
+                $data['error']  = false;
+                $data['msg']  = "User Deleted Successfully";
+                return $data;
+            } else {
+                $data['error']  = true;
+                $data['msg']  = "User could not delete";
+                return $data;
+            }
+        } catch (\Throwable $th) {
+            $data['error']  = true;
+            $data['msg']  = "User could not be able to delete";
             return $data;
         }
     }
