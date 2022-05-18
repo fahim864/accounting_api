@@ -420,29 +420,17 @@ class Account
 
     public function productsAdd($admin_id, $params)
     {
-        var_dump($params);
-        exit;
-        
         $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
-
-        $user_fname = $params["u_fname"];
-        $user_lname = $params["u_lname"];
-        $user_email = $params["u_email"];
-        $user_status = $params["u_status"];
-        $user_role = $params["u_role"];
-        $user_password = md5($params["u_password"]);
-        if (!empty($user_role) && !empty($user_email) && (!empty($user_status) && ($user_status === "0" || $user_status === "1")) && !empty($user_password) && !empty($user_fname) && !empty($user_lname)) {
+        $p_name = $params["p_name"];
+        $gst_cata = $params["gst_cata"];
+        $hsn = $params["hsn"];
+        $gst_appli = $params["gst_appli"];
+        if (!empty($p_name) && !empty($gst_cata) && !empty($hsn) && !empty($gst_appli)) {
             $date = date("Y-m-d H:i:s");
-            if ($this->user_email_exists($user_email)) {
-                $data['error']  = true;
-                $data['msg']  = "Email is exists or not valid number";
-                return $data;
-            }
-            try {
-                //code...
-                $qry_ins_std = "INSERT INTO `user`(`adminid`, `first_name`, `last_name`, `email`, `password`, `status`, `role`, `hash`, `created_on`) VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+           
+                $qry_ins_std = "INSERT INTO `goods_master`(`admin_id`, `goods_name`, `gst_category`, `hsn_code`, `gst_applicable`, `effective_start_date`, `effective_end_date`, `tracking`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
-                if ($res_ins_std->execute([$admin_id, $user_fname, $user_lname, $user_email, $user_password, $user_status, $user_role, RAND(9999, 99999), $date])) {
+                if ($res_ins_std->execute([$admin_id, $p_name, $gst_cata, $hsn, $gst_appli, $date, NULL, NULL])) {
                     $data['error']  = false;
                     $data['msg']  = "User added Successfully";
                     return $data;
@@ -451,12 +439,7 @@ class Account
                     $data['msg']  = "User could not add to storage";
                     return $data;
                 }
-            } catch (\Throwable $th) {
-
-                $data['error']  = true;
-                $data['msg']  = "User could not be able to enter";
-                return $data;
-            }
+            
         } else {
             $data['error']  = true;
             $data['msg']  = "Invalid User Cred";
