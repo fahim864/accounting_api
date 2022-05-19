@@ -377,42 +377,23 @@ class Account
             $set_s_com_address = $params['s_com_address'];
             $set_s_language = $params['s_language'];
             $set_s_com_logo = $params['s_com_logo'];
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> 737aa8fd310d31d25a95bb44ec96964f97b2d3f5
             $qry_upd_cust = "SELECT `setting_name` FROM `settings` WHERE `admin_id` = ?";
             $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
             $res_upd_cust->execute([$admin_id]);
             if ($res_upd_cust->rowCount() > 0) {
                 $qry_set_upd = "UPDATE `settings` SET `setting_name`=?, `company_name`=?, `address`=?, `gsttin`=?, `company_logo`=?, `phone_number`=?  WHERE `admin_id` = ?";
                 $res_set_upd = $this->dbhandler->prepare($qry_set_upd);
-                if ($res_set_upd->execute([$set_s_name, $set_s_company_name, $set_s_com_address, $set_s_com_tin, $set_s_com_logo, $set_s_com_phone, $admin_id])) {
-                    $data['error']  = false;
-                    $data['msg']  = "Settings updated Successfully";
-                    return $data;
-                } else {
-                    $data['error']  = true;
-                    $data['msg']  = "Settings could not update";
-                    return $data;
+                if ($res_set_upd->execute()) {
                 }
+                $data['error']  = false;
+                $data['msg']  = "Settings updated Successfully";
+                return $data;
             } else {
-                $qry_set_ins = "INSERT INTO `settings`(`admin_id`, `setting_name`, `company_name`, `address`, `gsttin`, `company_logo`, `phone_number`) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                $res_set_ins = $this->dbhandler->prepare($qry_set_ins);
-                if ($res_set_ins->execute([$admin_id, $set_s_name, $set_s_company_name, $set_s_com_address, $set_s_com_tin, $set_s_com_logo, $set_s_com_phone])) {
-                    $data['error']  = false;
-                    $data['msg']  = "Settings added Successfully";
-                    return $data;
-                } else {
-                    $data['error']  = true;
-                    $data['msg']  = "Settings could not add";
-                    return $data;
-                }
+                $data['error']  = true;
+                $data['msg']  = "Settings could not update";
+                return $data;
             }
         } catch (\Throwable $th) {
-            echo $th->getMessage();
             $data['error']  = true;
             $data['msg']  = "Settings could not be able to update";
             return $data;
@@ -453,24 +434,11 @@ class Account
         $gst_appli = $params["gst_appli"];
         if (!empty($p_name) && !empty($gst_cata) && !empty($hsn) && !empty($gst_appli)) {
             $date = date("Y-m-d H:i:s");
-            if ($this->product_exists($p_name)) {
+            if($this->product_exists($p_name)){
                 $data['error']  = true;
                 $data['msg']  = "Product Already exists.";
                 return $data;
             }
-<<<<<<< HEAD
-            $qry_ins_std = "INSERT INTO `goods_master`(`admin_id`, `product_id`, `goods_name`, `gst_category`, `hsn_code`, `gst_applicable`, `effective_start_date`, `effective_end_date`, `tracking`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
-            if ($res_ins_std->execute([$admin_id, $p_name, $gst_cata, $hsn, $gst_appli, $date, NULL, NULL])) {
-                $data['error']  = false;
-                $data['msg']  = "Product added Successfully";
-                return $data;
-            } else {
-                $data['error']  = true;
-                $data['msg']  = "Product could not add to storage";
-                return $data;
-            }
-=======
                 $qry_ins_std = "INSERT INTO `goods_master`(`admin_id`, `goods_name`, `gst_category`, `hsn_code`, `gst_applicable`, `effective_start_date`, `effective_end_date`, `tracking`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
                 if ($res_ins_std->execute([$admin_id, $p_name, $gst_cata, $hsn, $gst_appli, $date, NULL, NULL])) {
@@ -483,7 +451,6 @@ class Account
                     return $data;
                 }
             
->>>>>>> 737aa8fd310d31d25a95bb44ec96964f97b2d3f5
         } else {
             $data['error']  = true;
             $data['msg']  = "Invalid Product Cred";
@@ -500,12 +467,12 @@ class Account
         $hsn = $params["hsn"];
         $gst_appli = $params["gst_appli"];
         $date = date("Y-m-d H:i:s");
-        if ($this->product_exists($p_name, $e_id)) {
+        if($this->product_exists($p_name, $e_id)){
             $data['error']  = true;
             $data['msg']  = "Product already exists.";
             return $data;
         }
-
+        
         try {
             //code...
             $qry_select_cust = "SELECT `tracking` FROM `goods_master` WHERE `id` = ?";
@@ -531,6 +498,7 @@ class Account
                 $data['msg']  = "Product could not add to storage";
                 return $data;
             }
+            
         } catch (\Throwable $th) {
             echo $th->getMessage();
             $data['error']  = true;
@@ -538,24 +506,6 @@ class Account
             return $data;
         }
     }
-<<<<<<< HEAD
-    private function create_product_id()
-    {
-        $qry_ins_std = "SELECT `product_id` FROM `goods_master` WHERE `product_id` IS NOT NULL ORDER BY `product_id` DESC LIMIT 1";
-        $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
-        $res_ins_std->execute();
-        if ($res_ins_std->rowCount() < 1) {
-            return "P10001";
-        } else {
-            $row_ins_std = $res_ins_std->fetch();
-            if ($row_ins_std['product_id']) {
-            }
-            $product_id = filter_var($row_ins_std['product_id'], FILTER_SANITIZE_NUMBER_INT) + 1;
-            return "P" . $product_id;
-        }
-    }
-=======
->>>>>>> 737aa8fd310d31d25a95bb44ec96964f97b2d3f5
 
     private function product_exists($product_name, $p_id = null)
     {
