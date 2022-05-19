@@ -495,7 +495,6 @@ class Account
             return $data;
         }
     }
-
     private function create_product_id(){
         $qry_ins_std = "SELECT `product_id` FROM `goods_master` WHERE `product_id` IS NOT NULL ORDER BY `product_id` DESC LIMIT 1";
         $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
