@@ -428,6 +428,116 @@ class Account
         }
     }
 
+    public function productsAdd($admin_id, $params)
+    {
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+        $p_name = $params["p_name"];
+        $gst_cata = $params["gst_cata"];
+        $hsn = $params["hsn"];
+        $gst_appli = $params["gst_appli"];
+        if (!empty($p_name) && !empty($gst_cata) && !empty($hsn) && !empty($gst_appli)) {
+            $date = date("Y-m-d H:i:s");
+            if($this->product_exists($p_name)){
+                $data['error']  = true;
+                $data['msg']  = "Product Already exists.";
+                return $data;
+            }
+                $product_id = $this->create_product_id();
+                $qry_ins_std = "INSERT INTO `goods_master`(`admin_id`, `product_id`, `goods_name`, `gst_category`, `hsn_code`, `gst_applicable`, `effective_start_date`, `effective_end_date`, `tracking`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
+                if ($res_ins_std->execute([$admin_id, $product_id, $p_name, $gst_cata, $hsn, $gst_appli, $date, NULL, NULL])) {
+                    $data['error']  = false;
+                    $data['msg']  = "User added Successfully";
+                    return $data;
+                } else {
+                    $data['error']  = true;
+                    $data['msg']  = "User could not add to storage";
+                    return $data;
+                }
+            
+        } else {
+            $data['error']  = true;
+            $data['msg']  = "Invalid User Cred";
+            return $data;
+        }
+    }
+
+    public function productsEdit($admin_id, $params)
+    {
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+        $e_id = $params["e_id"];
+        $p_name = $params["p_name"];
+        $gst_cata = $params["gst_cata"];
+        $hsn = $params["hsn"];
+        $gst_appli = $params["gst_appli"];
+        $date = date("Y-m-d H:i:s");
+        if($this->product_exists($p_name, $e_id)){
+            $data['error']  = true;
+            $data['msg']  = "Product already exists.";
+            return $data;
+        }
+        
+        try {
+            //code...
+            $qry_upd_cust = "UPDATE `goods_master` SET `effective_end_date`= CURRENT_TIMESTAMP() WHERE `effective_end_date` IS NULL AND `product_id` = ?";
+            $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
+            if ($res_upd_cust->execute([$e_id])) {
+                $qry_ins_std = "INSERT INTO `goods_master`(`admin_id`, `product_id`, `goods_name`, `gst_category`, `hsn_code`, `gst_applicable`, `effective_start_date`, `effective_end_date`, `tracking`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
+                if ($res_ins_std->execute([$admin_id, $e_id, $p_name, $gst_cata, $hsn, $gst_appli, $date, NULL, NULL])) {
+                    $data['error']  = false;
+                    $data['msg']  = "Product added Successfully";
+                    return $data;
+                } else {
+                    $data['error']  = true;
+                    $data['msg']  = "Product could not add to storage";
+                    return $data;
+                }
+            } else {
+                $data['error']  = true;
+                $data['msg']  = "Product could not add to storage";
+                return $data;
+            }
+            
+        } catch (\Throwable $th) {
+            $data['error']  = true;
+            $data['msg']  = "Product could not be able to enter";
+            return $data;
+        }
+    }
+
+    private function create_product_id(){
+        $qry_ins_std = "SELECT `product_id` FROM `goods_master` WHERE `product_id` IS NOT NULL ORDER BY `product_id` DESC LIMIT 1";
+        $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
+        $res_ins_std->execute();
+        if ($res_ins_std->rowCount() < 1) {
+            return "P10001";
+        } else {
+            $row_ins_std = $res_ins_std->fetch();
+            if($row_ins_std['product_id']){
+
+            }
+            $product_id = filter_var($row_ins_std['product_id'], FILTER_SANITIZE_NUMBER_INT) + 1;
+            return "P" . $product_id;
+        }
+    }
+
+    private function product_exists($product_name, $p_id = null)
+    {
+        if ($p_id === NULL) {
+            $qry_ins_std = "SELECT `goods_name` FROM `goods_master` WHERE `goods_name` = ? AND `effective_end_date` IS NULL;";
+        } else {
+            $qry_ins_std = "SELECT `goods_name` FROM `goods_master` WHERE `goods_name` = ? AND `effective_end_date` IS NULL     AND `id`<> '$p_id'";
+        }
+        $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
+        $res_ins_std->execute([$product_name]);
+        if ($res_ins_std->rowCount() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private function usr_role_exists($role)
     {
         $qry_ins_std = "SELECT `role_name` FROM `user_role` WHERE `id` = ? AND `status` = 0";
