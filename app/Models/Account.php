@@ -442,22 +442,21 @@ class Account
                 $data['msg']  = "Product Already exists.";
                 return $data;
             }
-                $product_id = $this->create_product_id();
                 $qry_ins_std = "INSERT INTO `goods_master`(`admin_id`, `product_id`, `goods_name`, `gst_category`, `hsn_code`, `gst_applicable`, `effective_start_date`, `effective_end_date`, `tracking`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
-                if ($res_ins_std->execute([$admin_id, $product_id, $p_name, $gst_cata, $hsn, $gst_appli, $date, NULL, NULL])) {
+                if ($res_ins_std->execute([$admin_id, $p_name, $gst_cata, $hsn, $gst_appli, $date, NULL, NULL])) {
                     $data['error']  = false;
-                    $data['msg']  = "User added Successfully";
+                    $data['msg']  = "Product added Successfully";
                     return $data;
                 } else {
                     $data['error']  = true;
-                    $data['msg']  = "User could not add to storage";
+                    $data['msg']  = "Product could not add to storage";
                     return $data;
                 }
             
         } else {
             $data['error']  = true;
-            $data['msg']  = "Invalid User Cred";
+            $data['msg']  = "Invalid Product Cred";
             return $data;
         }
     }
