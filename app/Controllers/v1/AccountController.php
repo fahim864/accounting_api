@@ -262,4 +262,22 @@ class AccountController
 
         return $res->withJson($res_data);
     }
+
+    //products_import info
+    public function products_import(Request $req, Response $res)
+    {
+        $requestUser = $this->auth->requestUser($req);
+        $admin_id = $this->user->get_User_Id();
+        if (is_null($requestUser)) {
+            return $res->withJson([], 401);
+        }
+        if ($requestUser['id'] !== $admin_id) {
+            return $res->withJson([], 401);
+        }
+        $data = $req->getParsedBody();
+        foreach ($data['importData'] as $key) {
+            $res_data = $this->account->productsAdd($admin_id, $key);
+        }
+        return $res->withJson($res_data);
+    }
 }
