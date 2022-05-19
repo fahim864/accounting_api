@@ -530,22 +530,22 @@ class Account
         $invoice_num = $params['srch'];
         try {
             //code...
-            $qry_upd_cust = "SELECT * FROM `goods_master` WHERE `admin_id` = ? AND `effective_end_date` IS NULL";
+            $qry_upd_cust = "SELECT `invoice_no`,`invoice_date`,`amount_paid`,`amount_due` FROM `invoice_master` WHERE `admin_id`= ? AND `invoice_no`= ?";
             $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
-            if ($res_upd_cust->execute([$admin_id])) {
+            if ($res_upd_cust->execute([$admin_id, $invoice_num])) {
                 $row_upd_cust = $res_upd_cust->fetchAll();
                 $data['error']  = false;
-                $data['msg']  = "Product fetched Successfully";
+                $data['msg']  = "Realisation fetched Successfully";
                 $data['data'] = $row_upd_cust;
                 return $data;
             } else {
                 $data['error']  = true;
-                $data['msg']  = "Product could not delete";
+                $data['msg']  = "Realisation could not delete";
                 return $data;
             }
         } catch (\Throwable $th) {
             $data['error']  = true;
-            $data['msg']  = "Product could not be able to delete";
+            $data['msg']  = "Realisation could not be able to delete";
             return $data;
         }
     }
