@@ -410,7 +410,6 @@ class Account
                 }
             }
         } catch (\Throwable $th) {
-            echo $th->getMessage();
             $data['error']  = true;
             $data['msg']  = "Settings could not be able to update";
             return $data;
