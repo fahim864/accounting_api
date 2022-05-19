@@ -370,7 +370,6 @@ class Account
             }
 
             $params = $d;
-
             $set_s_name = $params['s_name'];
             $set_s_company_name = $params['s_company_name'];
             $set_s_com_phone = $params['s_com_phone'];
@@ -378,8 +377,6 @@ class Account
             $set_s_com_address = $params['s_com_address'];
             $set_s_language = $params['s_language'];
             $set_s_com_logo = $params['s_com_logo'];
-
-
             $qry_upd_cust = "SELECT `setting_name` FROM `settings` WHERE `admin_id` = ?";
             $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
             $res_upd_cust->execute([$admin_id]);
@@ -478,14 +475,18 @@ class Account
         
         try {
             //code...
-            $qry_upd_cust = "UPDATE `goods_master` SET `effective_end_date`= CURRENT_TIMESTAMP() WHERE `effective_end_date` IS NULL AND `product_id` = ?";
+            $qry_select_cust = "SELECT `tracking` FROM `goods_master` WHERE `id` = ?";
+            $res_select_cust = $this->dbhandler->prepare($qry_select_cust);
+            $res_select_cust->execute([$e_id]);
+            $row_select_cust = $res_select_cust->fetch();
+            $qry_upd_cust = "UPDATE `goods_master` SET `effective_end_date`= CURRENT_TIMESTAMP() WHERE `effective_end_date` IS NULL AND `id` = ?";
             $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
             if ($res_upd_cust->execute([$e_id])) {
-                $qry_ins_std = "INSERT INTO `goods_master`(`admin_id`, `product_id`, `goods_name`, `gst_category`, `hsn_code`, `gst_applicable`, `effective_start_date`, `effective_end_date`, `tracking`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $qry_ins_std = "INSERT INTO `goods_master`(`admin_id`, `goods_name`, `gst_category`, `hsn_code`, `gst_applicable`, `effective_start_date`, `effective_end_date`, `tracking`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
-                if ($res_ins_std->execute([$admin_id, $e_id, $p_name, $gst_cata, $hsn, $gst_appli, $date, NULL, NULL])) {
+                if ($res_ins_std->execute([$admin_id, $p_name, $gst_cata, $hsn, $gst_appli, $date, NULL, $row_select_cust['tracking']])) {
                     $data['error']  = false;
-                    $data['msg']  = "Product added Successfully";
+                    $data['msg']  = "Product edited Successfully";
                     return $data;
                 } else {
                     $data['error']  = true;
@@ -499,6 +500,7 @@ class Account
             }
             
         } catch (\Throwable $th) {
+            echo $th->getMessage();
             $data['error']  = true;
             $data['msg']  = "Product could not be able to enter";
             return $data;
