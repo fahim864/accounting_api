@@ -371,24 +371,34 @@ class Account
 
             $params = $d;
 
-            var_dump($params);
-            exit;
+            $set_s_name = $params['s_name'];
+            $set_s_company_name = $params['s_company_name'];
+            $set_s_com_phone = $params['s_com_phone'];
+            $set_s_com_tin = $params['s_com_tin'];
+            $set_s_com_address = $params['s_com_address'];
+            $set_s_language = $params['s_language'];
+            $set_s_com_logo = $params['s_com_logo'];
+
 
             $qry_upd_cust = "SELECT `setting_name` FROM `settings` WHERE `admin_id` = ?";
             $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
             $res_upd_cust->execute([$admin_id]);
             if ($res_upd_cust->rowCount() > 0) {
+                $qry_set_upd = "UPDATE `settings` SET `setting_name`=?, `company_name`=?, `address`=?, `gsttin`=?, `company_logo`=?, `phone_number`=?  WHERE `admin_id` = ?";
+                $res_set_upd = $this->dbhandler->prepare($qry_set_upd);
+                if ($res_set_upd->execute()) {
+                }
                 $data['error']  = false;
-                $data['msg']  = "User Deleted Successfully";
+                $data['msg']  = "Settings updated Successfully";
                 return $data;
             } else {
                 $data['error']  = true;
-                $data['msg']  = "User could not delete";
+                $data['msg']  = "Settings could not update";
                 return $data;
             }
         } catch (\Throwable $th) {
             $data['error']  = true;
-            $data['msg']  = "User could not be able to delete";
+            $data['msg']  = "Settings could not be able to update";
             return $data;
         }
     }
