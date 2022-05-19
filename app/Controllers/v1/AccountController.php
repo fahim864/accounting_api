@@ -280,4 +280,20 @@ class AccountController
         }
         return $res->withJson($res_data);
     }
+    //realisation_search info
+    public function realisation_search(Request $req, Response $res)
+    {
+        $requestUser = $this->auth->requestUser($req);
+        $admin_id = $this->user->get_User_Id();
+        if (is_null($requestUser)) {
+            return $res->withJson([], 401);
+        }
+        if ($requestUser['id'] !== $admin_id) {
+            return $res->withJson([], 401);
+        }
+        $data = $req->getParsedBody();
+        $res_data = $this->account->realisationSearch($admin_id, $data);
+
+        return $res->withJson($res_data);
+    }
 }

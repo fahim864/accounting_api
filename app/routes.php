@@ -38,3 +38,8 @@ $app->group('/v1/products', function () use ($app) {
     $app->put('/edit', AccountController::class . ':products_edit')->add($jwtMiddleware)->setName('account.products_edit');
     $app->post('/import', AccountController::class . ':products_import')->add($jwtMiddleware)->setName('account.products_import');
 });
+
+$app->group('/v1/realisation', function () use ($app) {
+    $jwtMiddleware = $this->getContainer()->get('jwt');
+    $app->post('/search', AccountController::class . ':realisation_search')->add($jwtMiddleware)->setName('account.realisation_search');
+});

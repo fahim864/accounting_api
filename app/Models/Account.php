@@ -522,6 +522,34 @@ class Account
         }
     }
 
+    public function realisationSearch($admin_id, $params)
+    {
+        var_dump($params['srch']);
+        exit;
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+        $invoice_num = $params['srch'];
+        try {
+            //code...
+            $qry_upd_cust = "SELECT * FROM `goods_master` WHERE `admin_id` = ? AND `effective_end_date` IS NULL";
+            $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
+            if ($res_upd_cust->execute([$admin_id])) {
+                $row_upd_cust = $res_upd_cust->fetchAll();
+                $data['error']  = false;
+                $data['msg']  = "Product fetched Successfully";
+                $data['data'] = $row_upd_cust;
+                return $data;
+            } else {
+                $data['error']  = true;
+                $data['msg']  = "Product could not delete";
+                return $data;
+            }
+        } catch (\Throwable $th) {
+            $data['error']  = true;
+            $data['msg']  = "Product could not be able to delete";
+            return $data;
+        }
+    }
+
     private function product_exists($product_name, $p_id = null)
     {
         if ($p_id === NULL) {
