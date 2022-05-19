@@ -546,6 +546,32 @@ class Account
             return $data;
         }
     }
+    public function sales_usersearch($admin_id, $params)
+    {
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+        $phone_num = filter_var($params['phone_number'], FILTER_SANITIZE_STRING) . "%";
+        $c_type = filter_var($params['c_type'], FILTER_SANITIZE_STRING);
+        try {
+            //code...
+            $qry_upd_cust = "SELECT `id`, `customer_phone` FROM `customer` WHERE `admin_id` = ? AND `customer_eff_sdc_end_date` IS NULL AND `customer_type` = ? AND `customer_phone` LIKE ? ORDER BY `customer_phone` ASC";
+            $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
+            if ($res_upd_cust->execute([$admin_id, $c_type, $phone_num])) {
+                $row_upd_cust = $res_upd_cust->fetchAll();
+                $data['error']  = false;
+                $data['msg']  = "Sales user fetched Successfully";
+                $data['data'] = $row_upd_cust;
+                return $data;
+            } else {
+                $data['error']  = true;
+                $data['msg']  = "Sales user could not delete";
+                return $data;
+            }
+        } catch (\Throwable $th) {
+            $data['error']  = true;
+            $data['msg']  = "Sales user could not be able to delete";
+            return $data;
+        }
+    }
 
     public function paymenttosupplierSearch($admin_id, $params)
     {

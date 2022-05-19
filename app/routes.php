@@ -48,3 +48,11 @@ $app->group('/v1/payment_to_supplier', function () use ($app) {
     $jwtMiddleware = $this->getContainer()->get('jwt');
     $app->post('/search', AccountController::class . ':payment_to_supplier_search')->add($jwtMiddleware)->setName('account.payment_to_supplier_search');
 });
+
+$app->group('/v1/sales', function () use ($app) {
+    $jwtMiddleware = $this->getContainer()->get('jwt');
+    $app->get('/user_search', AccountController::class . ':sales_user_search')->add($jwtMiddleware)->setName('account.sales_user_search');
+    $app->post('/add', AccountController::class . ':sales_add')->add($jwtMiddleware)->setName('account.sales_add');
+    $app->put('/edit', AccountController::class . ':sales_edit')->add($jwtMiddleware)->setName('account.sales_edit');
+    $app->post('/import', AccountController::class . ':sales_import')->add($jwtMiddleware)->setName('account.sales_import');
+});
