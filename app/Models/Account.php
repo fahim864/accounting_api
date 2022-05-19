@@ -524,8 +524,6 @@ class Account
 
     public function realisationSearch($admin_id, $params)
     {
-        var_dump($params['srch']);
-        exit;
         $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
         $invoice_num = $params['srch'];
         try {
