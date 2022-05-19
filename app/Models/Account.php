@@ -548,6 +548,32 @@ class Account
         }
     }
 
+    public function paymenttosupplierSearch($admin_id, $params)
+    {
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+        $invoice_num = $params['srch'];
+        try {
+            //code...
+            $qry_upd_cust = "SELECT `bill_no`,`bill_date`,`amt_paid`,`amt_due` FROM `bill_master` WHERE `admin_id` = ? AND `bill_no` = ? ";
+            $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
+            if ($res_upd_cust->execute([$admin_id, $invoice_num])) {
+                $row_upd_cust = $res_upd_cust->fetchAll();
+                $data['error']  = false;
+                $data['msg']  = "Realisation fetched Successfully";
+                $data['data'] = $row_upd_cust;
+                return $data;
+            } else {
+                $data['error']  = true;
+                $data['msg']  = "Realisation could not delete";
+                return $data;
+            }
+        } catch (\Throwable $th) {
+            $data['error']  = true;
+            $data['msg']  = "Realisation could not be able to delete";
+            return $data;
+        }
+    }
+
     private function product_exists($product_name, $p_id = null)
     {
         if ($p_id === NULL) {

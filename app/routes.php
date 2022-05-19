@@ -43,3 +43,8 @@ $app->group('/v1/realisation', function () use ($app) {
     $jwtMiddleware = $this->getContainer()->get('jwt');
     $app->post('/search', AccountController::class . ':realisation_search')->add($jwtMiddleware)->setName('account.realisation_search');
 });
+
+$app->group('/v1/payment_to_supplier', function () use ($app) {
+    $jwtMiddleware = $this->getContainer()->get('jwt');
+    $app->post('/search', AccountController::class . ':payment_to_supplier_search')->add($jwtMiddleware)->setName('account.payment_to_supplier_search');
+});
