@@ -439,7 +439,7 @@ class Account
                 $data['msg']  = "Product Already exists.";
                 return $data;
             }
-                $qry_ins_std = "INSERT INTO `goods_master`(`admin_id`, `product_id`, `goods_name`, `gst_category`, `hsn_code`, `gst_applicable`, `effective_start_date`, `effective_end_date`, `tracking`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $qry_ins_std = "INSERT INTO `goods_master`(`admin_id`, `goods_name`, `gst_category`, `hsn_code`, `gst_applicable`, `effective_start_date`, `effective_end_date`, `tracking`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
                 if ($res_ins_std->execute([$admin_id, $p_name, $gst_cata, $hsn, $gst_appli, $date, NULL, NULL])) {
                     $data['error']  = false;
@@ -504,21 +504,6 @@ class Account
             $data['error']  = true;
             $data['msg']  = "Product could not be able to enter";
             return $data;
-        }
-    }
-    private function create_product_id(){
-        $qry_ins_std = "SELECT `product_id` FROM `goods_master` WHERE `product_id` IS NOT NULL ORDER BY `product_id` DESC LIMIT 1";
-        $res_ins_std = $this->dbhandler->prepare($qry_ins_std);
-        $res_ins_std->execute();
-        if ($res_ins_std->rowCount() < 1) {
-            return "P10001";
-        } else {
-            $row_ins_std = $res_ins_std->fetch();
-            if($row_ins_std['product_id']){
-
-            }
-            $product_id = filter_var($row_ins_std['product_id'], FILTER_SANITIZE_NUMBER_INT) + 1;
-            return "P" . $product_id;
         }
     }
 
