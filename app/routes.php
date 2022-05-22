@@ -56,3 +56,8 @@ $app->group('/v1/sales', function () use ($app) {
     $app->put('/edit', AccountController::class . ':sales_edit')->add($jwtMiddleware)->setName('account.sales_edit');
     $app->post('/import', AccountController::class . ':sales_import')->add($jwtMiddleware)->setName('account.sales_import');
 });
+
+$app->group('/v1/purchase', function () use ($app) {
+    $jwtMiddleware = $this->getContainer()->get('jwt');
+    $app->get('/search_supplier', AccountController::class . ':purchase_search_supplier')->add($jwtMiddleware)->setName('account.purchase_search_supplier');
+});
