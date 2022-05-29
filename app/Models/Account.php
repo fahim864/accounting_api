@@ -609,28 +609,19 @@ class Account
     public function purchasesearchSupplier($admin_id, $params)
     {
         $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
-        $invoice_num = $params['srch'];
+        $num = $params['s_name'];
 
-        var_dump();
-        exit;
-        try {
-            //code...
-            $qry_upd_cust = "SELECT `bill_no`,`bill_date`,`amt_paid`,`amt_due` FROM `bill_master` WHERE `admin_id` = ? AND `bill_no` = ? ";
-            $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
-            if ($res_upd_cust->execute([$admin_id, $invoice_num])) {
-                $row_upd_cust = $res_upd_cust->fetchAll();
-                $data['error']  = false;
-                $data['msg']  = "Realisation fetched Successfully";
-                $data['data'] = $row_upd_cust;
-                return $data;
-            } else {
-                $data['error']  = true;
-                $data['msg']  = "Realisation could not delete";
-                return $data;
-            }
-        } catch (\Throwable $th) {
+        $qry_upd_cust = "SELECT `customer_name`, `customer_email`, `customer_phone`, `customer_creation` FROM `customer` WHERE `admin_id` = ? AND `customer_phone`= ?";
+        $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
+        if ($res_upd_cust->execute([$admin_id, $num])) {
+            $row_upd_cust = $res_upd_cust->fetchAll();
+            $data['error']  = false;
+            $data['msg']  = "Purcha fetched Successfully";
+            $data['data'] = $row_upd_cust;
+            return $data;
+        } else {
             $data['error']  = true;
-            $data['msg']  = "Realisation could not be able to delete";
+            $data['msg']  = "Purcha could not fetched";
             return $data;
         }
     }

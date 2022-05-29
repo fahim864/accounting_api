@@ -59,5 +59,5 @@ $app->group('/v1/sales', function () use ($app) {
 
 $app->group('/v1/purchase', function () use ($app) {
     $jwtMiddleware = $this->getContainer()->get('jwt');
-    $app->get('/search_supplier', AccountController::class . ':purchase_search_supplier')->add($jwtMiddleware)->setName('account.purchase_search_supplier');
+    $app->post('/search_supplier', AccountController::class . ':purchase_search_supplier')->add($jwtMiddleware)->setName('account.purchase_search_supplier');
 });
