@@ -28,6 +28,7 @@ $app->group('/v1/user', function () use ($app) {
 
 $app->group('/v1', function () use ($app) {
     $jwtMiddleware = $this->getContainer()->get('jwt');
+    $app->get('/settings', AccountController::class . ':settingsReturn')->add($jwtMiddleware)->setName('account.SettingsReturn');
     $app->post('/settings', AccountController::class . ':settingsControl')->add($jwtMiddleware)->setName('account.Settings');
 });
 

@@ -189,6 +189,22 @@ class AccountController
         return $res->withJson($res_data);
     }
 
+    //settingsReturn info
+    public function settingsReturn(Request $req, Response $res)
+    {
+        $requestUser = $this->auth->requestUser($req);
+        $admin_id = $this->user->get_User_Id();
+        if (is_null($requestUser)) {
+            return $res->withJson([], 401);
+        }
+        if ($requestUser['id'] !== $admin_id) {
+            return $res->withJson([], 401);
+        }
+        $data = $req->getParsedBody();
+        $res_data = $this->account->settingsReturnModel($admin_id);
+
+        return $res->withJson($res_data);
+    }
     //settingsControl info
     public function settingsControl(Request $req, Response $res)
     {
@@ -323,7 +339,7 @@ class AccountController
         return $res->withJson($res_data);
     }
 
-//purchase_search_supplier info
+    //purchase_search_supplier info
     public function purchase_search_supplier(Request $req, Response $res)
     {
         $requestUser = $this->auth->requestUser($req);

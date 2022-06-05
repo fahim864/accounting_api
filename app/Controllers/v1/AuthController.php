@@ -44,6 +44,10 @@ class AuthController
                     401
                 );
             } elseif ($user === 2) {
+                if (!isset($userParams['name'])) {
+                    return $response->withJson(['error' => true], 401);
+                }
+
                 $user = $this->auth->createUserAdmin($userParams['email'], $userParams['password'], $userParams['name']);
 
                 $user->token = $this->auth->generateToken($user);

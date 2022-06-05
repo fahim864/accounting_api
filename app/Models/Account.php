@@ -354,6 +354,25 @@ class Account
         }
     }
 
+    public function settingsReturnModel($admin_id)
+    {
+        $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
+        try {
+            //code...
+            $qry_upd_cust = "SELECT * FROM `settings` WHERE `admin_id` = ?";
+            $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
+            $res_upd_cust->execute([$admin_id]);
+            return [
+                "error" => false,
+                "msg"   => "Settings information fetched Successfully.",
+                "data"  => $res_upd_cust->fetchAll()
+            ];
+        } catch (\Throwable $th) {
+            $data['error']  = true;
+            $data['msg']  = "Settings could not be able to update";
+            return $data;
+        }
+    }
     public function settingsModel($admin_id, $params)
     {
         $admin_id = filter_var($admin_id, FILTER_SANITIZE_NUMBER_INT);
@@ -378,16 +397,13 @@ class Account
             $set_s_com_address = $params['s_com_address'];
             $set_s_language = $params['s_language'];
             $set_s_com_logo = $params['s_com_logo'];
-
-
-
             $qry_upd_cust = "SELECT `setting_name` FROM `settings` WHERE `admin_id` = ?";
             $res_upd_cust = $this->dbhandler->prepare($qry_upd_cust);
             $res_upd_cust->execute([$admin_id]);
             if ($res_upd_cust->rowCount() > 0) {
-                $qry_set_upd = "UPDATE `settings` SET `setting_name`=?, `company_name`=?, `address`=?, `gsttin`=?, `company_logo`=?, `phone_number`=?  WHERE `admin_id` = ?";
+                $qry_set_upd = "UPDATE `settings` SET `setting_name`=?, `company_name`=?, `address`=?, `gsttin`=?, `company_logo`=?, `phone_number`=?, `language`=?  WHERE `admin_id` = ?";
                 $res_set_upd = $this->dbhandler->prepare($qry_set_upd);
-                if ($res_set_upd->execute([$set_s_name, $set_s_company_name, $set_s_com_address, $set_s_com_tin, $set_s_com_logo, $set_s_com_phone, $admin_id])) {
+                if ($res_set_upd->execute([$set_s_name, $set_s_company_name, $set_s_com_address, $set_s_com_tin, $set_s_com_logo, $set_s_com_phone, $set_s_language, $admin_id])) {
                     $data['error']  = false;
                     $data['msg']  = "Settings updated Successfully";
                     return $data;
@@ -397,9 +413,9 @@ class Account
                     return $data;
                 }
             } else {
-                $qry_set_ins = "INSERT INTO `settings`(`admin_id`, `setting_name`, `company_name`, `address`, `gsttin`, `company_logo`, `phone_number`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                $qry_set_ins = "INSERT INTO `settings`(`admin_id`, `setting_name`, `company_name`, `address`, `gsttin`, `company_logo`, `phone_number`, `language`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                 $res_set_ins = $this->dbhandler->prepare($qry_set_ins);
-                if ($res_set_ins->execute([$admin_id, $set_s_name, $set_s_company_name, $set_s_com_address, $set_s_com_tin, $set_s_com_logo, $set_s_com_phone])) {
+                if ($res_set_ins->execute([$admin_id, $set_s_name, $set_s_company_name, $set_s_com_address, $set_s_com_tin, $set_s_com_logo, $set_s_com_phone, $set_s_language])) {
                     $data['error']  = false;
                     $data['msg']  = "Settings added Successfully";
                     return $data;
