@@ -45,7 +45,7 @@ class AuthController
                 );
             } elseif ($user === 2) {
                 if (!isset($userParams['name'])) {
-                    return $response->withJson(['error' => true], 401);
+                    return $response->withJson(['error' => true, 'msg' => "User is not exists."], 401);
                 }
 
                 $user = $this->auth->createUserAdmin($userParams['email'], $userParams['password'], $userParams['name']);

@@ -229,7 +229,7 @@ class Account
         $user_status = $params["u_status"];
         $user_role = $params["u_role"];
         $user_password = md5($params["u_password"]);
-        if (!empty($user_role) && !empty($user_email) && (!empty($user_status) && ($user_status === "0" || $user_status === "1")) && !empty($user_password) && !empty($user_fname) && !empty($user_lname)) {
+        if ((strlen($user_role) > 0) && (strlen($user_email) > 0) && ((strlen($user_status) > 0) && ($user_status === "0" || $user_status === "1")) && (strlen($user_password) > 0) && (strlen($user_fname) > 0) && (strlen($user_lname) > 0)) {
             $date = date("Y-m-d H:i:s");
             if ($this->user_email_exists($user_email)) {
                 $data['error']  = true;
@@ -250,14 +250,13 @@ class Account
                     return $data;
                 }
             } catch (\Throwable $th) {
-
                 $data['error']  = true;
                 $data['msg']  = "User could not be able to enter";
                 return $data;
             }
         } else {
             $data['error']  = true;
-            $data['msg']  = "Invalid User Cred";
+            $data['msg']  = "Invalid User Cred1";
             return $data;
         }
     }
